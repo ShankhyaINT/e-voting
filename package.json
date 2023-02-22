@@ -1,0 +1,19 @@
+{
+  "name": "e-voting",
+  "version": "1.0.0",
+  "description": "E-voting using block-chain.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShankhyaINT/e-voting.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ShankhyaINT/e-voting/issues"
+  },
+  "homepage": "https://github.com/ShankhyaINT/e-voting#readme"
+}
