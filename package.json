@@ -1,19 +1,19 @@
 {
   "name": "e-voting",
   "version": "1.0.0",
-  "description": "E-voting using block-chain.",
-  "main": "index.js",
+  "description": "e-voting using block-chain",
+  "main": "src/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon src/app.js",
+    "start-server": "node src/app.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ShankhyaINT/e-voting.git"
-  },
-  "author": "",
+  "author": "Shankhya Subhra Datta",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/ShankhyaINT/e-voting/issues"
-  },
-  "homepage": "https://github.com/ShankhyaINT/e-voting#readme"
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.18.2",
+    "mongoose": "^6.9.2",
+    "nodemon": "^2.0.20"
+  }
 }

@@ -1,111 +1,56 @@
-process.env.TZ = "Asia/Seoul";
-import express from "express";
-import bearerToken from "express-bearer-token";
-import { resolve, dirname, join } from "path";
-import { v1Router } from "./routes/index.js";
-import { v1RouterAdmin } from "./routes/admin/index.js";
-import i18n from "i18n";
-import swaggerUi from "swagger-ui-express";
-import { handleError, morganConf, connect as dbConnect } from "./config/index.js";
-import { errors } from "celebrate";
-import cors from "cors";
-import { fileURLToPath } from "url";
-import { createServer } from "http";
+const path = require('path');
+
+const express = require('express');
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+
+const errorController = require('./controllers/error');
+const User = require('./models/user');
 
 const app = express();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+app.set('view engine', 'ejs');
+app.set('views', 'views');
 
-app.use("/uploads", express.static(join(__dirname, "../uploads")));
-/**
- * Initilization of API's documentation.
- * We used Swagger 3.
- */
-app.use("/api-docs/assets", express.static(join(__dirname, "assets", "swagger")));
-const options = {
-  explorer: true,
-  swaggerOptions: {
-    urls: [
-      {
-        url: "./assets/swagger_application.json",
-        name: "Application",
-      },
-    ],
-  },
-};
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(undefined, options));
+const adminRoutes = require('./routes/admin');
+const shopRoutes = require('./routes/shop');
 
-/**
- * Initilization of internationalization(i18n)
- * default language english.
- */
-i18n.configure({
-  locales: ["en", "ko"],
-  directory: resolve(__dirname, "./assets/locales"),
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use((req, res, next) => {
+  User.findById('5bab316ce0a7c75f783cb8a8')
+    .then(user => {
+      req.user = user;
+      next();
+    })
+    .catch(err => console.log(err));
 });
-app.use(i18n.init);
 
-/**
- * Basic header configuartion
- * It is recomanded to update this section, depending on application's needs
- */
-app.use(cors());
+app.use('/admin', adminRoutes);
+app.use(shopRoutes);
 
-/**
- * All express middleware goes here
- * parsing request body
- * `bearerToken` = For `Basic Auth` token
- */
-app.use(express.json());
-app.use(
-  express.urlencoded({
-    limit: "50mb",
-    extended: false,
-  }),
-);
-app.use(bearerToken());
-/**
- * Logger methods => error, warn, info, debug
- */
-app.use(morganConf);
+app.use(errorController.get404);
 
-/**
- * Handaling database connection
- */
-dbConnect();
-
-/**
- * Initializing APIs base routes
- */
-app.use("/api/v1", v1Router);
-app.use("/api/v1/admin", v1RouterAdmin);
-
-/**
- * Default Route
- */
-app.get("/", (_req, res) => res.send({ message: "Ok" }));
-
-/**
- * 404 Route
- */
-app.get("*", (req, res) => res.status(404).send({ message: "Not found!" }));
-
-/**
- * Overriding the express response
- * ok = 200
- * created = 201
- * noData = 204
- * badRequest = 400
- * forbidden = 403
- * severError = 500
- */
-app.use(errors());
-app.use(handleError);
-
-/**
- * Establish Socket.io Connection
- */
-const httpServer = createServer(app);
-
-export default httpServer;
+mongoose
+  .connect(
+    'mongodb+srv://shankhyasubhradatta:wL1xmqNSPGL20pQv@e-voting.ylsbija.mongodb.net/?retryWrites=true&w=majority'
+  )
+  .then(result => {
+    // User.findOne().then(user => {
+    //   if (!user) {
+    //     const user = new User({
+    //       name: 'Max',
+    //       email: 'max@test.com',
+    //       cart: {
+    //         items: []
+    //       }
+    //     });
+    //     user.save();
+    //   }
+    // });
+    app.listen(4000);
+  })
+  .catch(err => {
+    console.log(err);
+  });
